@@ -32,6 +32,8 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
+const PORT = process.env.PORT || 3000;
+
 mongoose
   .connect(
     'mongodb+srv://alexandermestre:Barcelona123@instance1project1.ytlxc.mongodb.net/project?retryWrites=true&w=majority'
@@ -49,7 +51,9 @@ mongoose
         user.save();
       }
     });
-    app.listen(2000);
+    app.listen(PORT, () => {
+        console.log(`Our app is running on port ${ PORT }`);
+    });
   })
   .catch(err => {
     console.log(err);
