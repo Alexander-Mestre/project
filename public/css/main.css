@@ -250,6 +250,16 @@ form {
   color: red;
 }
 
+.baner{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.baner h1 h2{
+  color: white;
+}
+
 @media (min-width: 768px) {
   .main-header__nav {
     display: flex;

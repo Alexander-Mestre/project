@@ -6,6 +6,18 @@
     <%- include('../includes/navigation.ejs') %>
 
     <main>
+        <div class="baner">
+
+            <h1>3D Market Place</h1>
+            <h3>Not the #1 3D asset store, but good enough</h3>
+            <form action="/" method="GET">
+            <input type="text" name="search" placeholder="Search">
+            <input type="submit" name="action" value="Search">
+            </form>
+
+
+        </div>
+
         <% if (prods.length > 0) { %>
             <div class="grid">
                 <% for (let product of prods) { %>

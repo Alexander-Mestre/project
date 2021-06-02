@@ -4,7 +4,7 @@ const Order = require('../models/order');
 exports.getProducts = (req, res, next) => {
   Product.find()
     .then(products => {
-      console.log(products);
+      //console.log(products);
       res.render('shop/product-list', {
         prods: products,
         pageTitle: 'All Products',
@@ -36,20 +36,59 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  Product.find()
-    .then(products => {
-      res.render('shop/index', {
-        prods: products,
-        pageTitle: 'Shop',
-        path: '/'
+
+  if (req.query.search) {
+    console.log("you are in the search section");
+    const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+    Product.find({title: regex})
+      .then(products => {
+        res.render('shop/index', {
+          prods: products,
+          pageTitle: 'Shop',
+          path: '/'
+        });
+      })
+      .catch(err => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
       });
-    })
-    .catch(err => {
+  } else {
+    console.log("not the search section")
+    Product.find()
+      .then(products => {
+        res.render('shop/index', {
+          prods: products,
+          pageTitle: 'Shop',
+          path: '/'
+        });
+      })
+      .catch(err => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+      });
+  }
+};
+
+//search result page
+/*
+exports.getSerach = (req, res, next) => {
+  Product.find({title: (regular expresion (search term))})
+  .then(results => {
+    res.render(shop.search-results,{
+      results: results,
+      pageTitle: 'Serach Results',
+      path: '/search'
+    });
+  })
+  .catch(err => {
       const error = new Error(err);
       error.httpStatusCode = 500;
       return next(error);
     });
-};
+*/
+
 
 exports.getCart = (req, res, next) => {
   req.user
@@ -107,7 +146,12 @@ exports.postOrder = (req, res, next) => {
     .execPopulate()
     .then(user => {
       const products = user.cart.items.map(i => {
-        return { quantity: i.quantity, product: { ...i.productId._doc } };
+        return {
+          quantity: i.quantity,
+          product: {
+            ...i.productId._doc
+          }
+        };
       });
       const order = new Order({
         user: {
@@ -132,7 +176,9 @@ exports.postOrder = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  Order.find({ 'user.userId': req.user._id })
+  Order.find({
+      'user.userId': req.user._id
+    })
     .then(orders => {
       res.render('shop/orders', {
         path: '/orders',
@@ -145,4 +191,8 @@ exports.getOrders = (req, res, next) => {
       error.httpStatusCode = 500;
       return next(error);
     });
+};
+
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 };
